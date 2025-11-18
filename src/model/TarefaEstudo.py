@@ -1,4 +1,3 @@
-# src/model/TarefaEstudo.py
 from datetime import datetime
 from abc import ABC, abstractmethod
 from .StatusTarefa import StatusTarefa
