@@ -1,6 +1,6 @@
 from enum import Enum
 
-class TipoTarefa(Enum):
+class TipoTarefaEstudo(Enum):
     QUIZ = "Quiz"
     LEITURA = "Leitura"
     PRATICA = "Prática"
