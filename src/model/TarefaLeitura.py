@@ -8,6 +8,7 @@ class TarefaLeitura(TarefaEstudo):
                  data_realizacao=None, status=StatusTarefa.A_FAZER):
         super().__init__(titulo=titulo, descricao=descricao,
                          data_realizacao=data_realizacao, status=status)
+        # atributos específicos
         self.total_paginas = total_paginas
         self.paginas_lidas = paginas_lidas
 
@@ -50,14 +51,16 @@ class TarefaLeitura(TarefaEstudo):
 
     def exibir_dados(self):
         base = super().exibir_dados()
-        info = (
-            f"Tipo: Leitura\n"
-            f"Páginas lidas: {self.paginas_lidas} de {self.total_paginas}\n"
-        )
-        return f"{base}\n{info}"
+        linhas = [
+            base,
+            "Tipo: Leitura",
+            f"Páginas lidas: {self.paginas_lidas} de {self.total_paginas}",
+        ]
+        return "\n".join(linhas)
 
     def definir_termino(self):
         """Conclui a leitura marcando data e status."""
         self.data_realizacao = datetime.now()
         self.status = StatusTarefa.CONCLUIDA
+
 
