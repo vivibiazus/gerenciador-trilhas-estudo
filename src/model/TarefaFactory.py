@@ -1,4 +1,3 @@
-# src/model/TarefaFactory.py
 from .TipoTarefaEstudo import TipoTarefaEstudo
 from .TarefaLeitura import TarefaLeitura
 from .TarefaQuiz import TarefaQuiz
