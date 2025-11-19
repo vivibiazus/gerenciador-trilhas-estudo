@@ -5,31 +5,30 @@ from .StatusTarefa import StatusTarefa
 
 class TarefaEstudo(ABC):
     def __init__(self, titulo, descricao=None, data_realizacao=None, status=StatusTarefa.A_FAZER):
-        self.__titulo = titulo
+        self.__titulo = str(titulo).strip().title() if titulo else "Tarefa"
         self.__descricao = descricao
-        self.__data_realizacao = None  # inicializa
+        self.__data_realizacao = None
         if data_realizacao is not None:
-            self.data_realizacao = data_realizacao
-        self.status = status
-        self.__concluida = False
+            self.data_realizacao = data_realizacao  # usa o setter
+        self.status = status  # valida pelo setter
 
-    # --- encapsulamento: getters e setters ---
+    # --- encapsulamento ---
 
     @property
     def titulo(self):
         return self.__titulo
 
     @titulo.setter
-    def titulo(self, nome):
-        self.__titulo = nome.strip().title() if nome else None
+    def titulo(self, valor):
+        self.__titulo = str(valor).strip().title() if valor else "Tarefa"
 
     @property
     def descricao(self):
         return self.__descricao
 
     @descricao.setter
-    def descricao(self, desc):
-        self.__descricao = desc
+    def descricao(self, valor):
+        self.__descricao = valor
 
     @property
     def data_realizacao(self):
@@ -37,20 +36,43 @@ class TarefaEstudo(ABC):
 
     @data_realizacao.setter
     def data_realizacao(self, data):
-        """Aceita string 'dd-mm-YYYY' ou datetime."""
+        """
+        Aceita string 'dd-mm-YYYY' ou datetime.
+        tenta como string; se falhar, tenta usar .strftime;
+        se não der, mantém None e avisa.
+        """
         self.__data_realizacao = None
-        if data is not None:
-            try:
-                if isinstance(data, str):
-                    self.__data_realizacao = datetime.strptime(data, "%d-%m-%Y")
-                elif isinstance(data, datetime):
-                    self.__data_realizacao = data
-                else:
-                    print("Data inválida")
-            except ValueError as e:
-                print(f"Data em formato inválido: {e}")
+        if data is None:
+            return         # tenta como string 'dd-mm-YYYY'
+        try:
+            self.__data_realizacao = datetime.strptime(str(data), "%d-%m-%Y")
+            return
+        except Exception:
+            pass         # tenta como objeto com .strftime (ex.: datetime)
+        try:
+            _ = data.strftime("%d-%m-%Y")
+            self.__data_realizacao = data
+        except Exception:
+            print("Data em formato inválido. Use 'dd-mm-YYYY' ou um datetime.")
 
-    # --- outros métodos  ---
+    @property
+    def status(self):
+        return self.__status
+
+    @status.setter
+    def status(self, novo_status):
+        if novo_status in (StatusTarefa.A_FAZER, StatusTarefa.EM_ANDAMENTO, StatusTarefa.CONCLUIDA):
+            self.__status = novo_status
+        else:
+            self.__status = StatusTarefa.A_FAZER
+
+  # --- derivado do status (sem flag duplicada) ---
+    @property
+    def concluida(self):
+        """True se o status está como CONCLUÍDA."""
+        return self.status == StatusTarefa.CONCLUIDA
+    
+    # --- ciclo de vida ---
 
     def concluir(self):
         self.__concluida = True
@@ -60,25 +82,36 @@ class TarefaEstudo(ABC):
     def iniciar_estudo(self):
         self.status = StatusTarefa.EM_ANDAMENTO
 
+    # --- apresentação / comparação ---
+
     def __str__(self):
         return f"{self.__class__.__name__}: {self.__titulo} [{self.status.value}]"
 
     def __eq__(self, outro):
-        if isinstance(outro, TarefaEstudo):
-            return self.titulo == outro.titulo and self.data_realizacao == outro.data_realizacao
-        return False
+        try:
+            return (self.titulo == outro.titulo) and (self.data_realizacao == outro.data_realizacao)
+        except Exception:
+            return False
+
+    # --- contrato das subclasses ---
 
     @abstractmethod
-    def exibir_dados(self):
-        """Retorna texto com dados da tarefa (sobrescrito nas filhas)."""
-        descricao = f"Descrição: {self.descricao}\n" if self.descricao else ""
-        data = f"{self.data_realizacao.strftime('%d-%m-%Y')}" if self.data_realizacao else "Sem data definida"
-        return (f"Tarefa: {self.titulo}\n"
-                f"{descricao}"
-                f"Status: {self.status.value}\n"
-                f"Data Realização: {data}")
+    def progresso(self):
+        """Retorna número entre 0.0 e 1.0."""
+        pass
 
     @abstractmethod
     def definir_termino(self):
-        """Define regras de término"""
+        """Ações específicas ao concluir (se necessário na subclasse)."""
         pass
+
+    # --- exibição genérica (subclasse pode sobrescrever) ---
+
+    def exibir_dados(self):
+        linhas = [f"Tarefa: {self.titulo}"]
+        if self.descricao:
+            linhas.append(f"Descrição: {self.descricao}")
+        linhas.append(f"Status: {self.status.value}")
+        data = self.data_realizacao.strftime("%d-%m-%Y") if self.data_realizacao else "Sem data definida"
+        linhas.append(f"Data Realização: {data}")
+        return "\n".join(linhas)
