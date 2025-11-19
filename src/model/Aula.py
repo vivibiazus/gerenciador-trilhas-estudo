@@ -16,7 +16,7 @@ class Aula:
     @property
     def tarefas(self):
         # expõe uma CÓPIA para não quebrar o encapsulamento
-        return list(self.__tarefas)
+        return self.__tarefas
 
     # --- operações de composição ---
 
@@ -32,9 +32,8 @@ class Aula:
             return 0.0
         soma = 0.0
         for t in self.__tarefas:
-            # cada tarefa concreta implementa seu próprio progresso()
-            soma += t.progresso()
-        return soma / float(len(self.__tarefas))
+            soma += t.progresso()   # cada tarefa concreta implementa seu próprio progresso()
+        return soma / len(self.__tarefas)
 
     # --- apresentação ---
 
