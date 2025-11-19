@@ -15,8 +15,8 @@ class Trilha:
 
     @property
     def cursos(self):
-        # devolve CÓPIA para preservar encapsulamento
-        return list(self.__cursos)
+        # estilo da prof: retorna a lista interna (sem cópia)
+        return self.__cursos
 
     # --- composição ---
 
@@ -31,7 +31,6 @@ class Trilha:
         """
         Recebe um objeto que implementa EstrategiaProgresso
         e delega o cálculo do progresso da trilha.
-        Retorna um valor entre 0.0 e 1.0.
         """
         if estrategia is None:
             return 0.0
@@ -43,9 +42,6 @@ class Trilha:
         return f"Trilha: {self.__nome} ({len(self.__cursos)} cursos)"
 
     def exibir_dados(self, estrategia=None):
-        """
-        Se receber uma estratégia, já mostra o progresso calculado.
-        """
         linhas = [
             f"Trilha: {self.__nome}",
             f"Quantidade de cursos: {len(self.__cursos)}",
@@ -53,4 +49,3 @@ class Trilha:
         if estrategia is not None:
             linhas.append(f"Progresso da trilha: {self.progresso(estrategia)*100:.0f}%")
         return "\n".join(linhas)
-
