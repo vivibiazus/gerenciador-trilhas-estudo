@@ -1,22 +1,36 @@
-import os, sys
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
+from model.TarefaFactory import TarefaFactory
+from model.TipoTarefaEstudo import TipoTarefaEstudo
+from model.TarefaLeitura import TarefaLeitura
+from model.TarefaQuiz import TarefaQuiz
+from model.TarefaPratica import TarefaPratica
+from model.TarefaProjeto import TarefaProjeto
 
-from app.enums import TipoTarefa
-from app.tarefa_factory import TarefaFactory
-from app.tarefas import TarefaQuiz, TarefaLeitura, TarefaPratica, TarefaProjeto
+print("\n=== Teste da TarefaFactory ===")
 
-def test_factory_cria_quiz():
-    obj = TarefaFactory.criar(TipoTarefa.QUIZ, nota=7, nota_max=10)
-    assert isinstance(obj, TarefaQuiz)
+# 1) Criação por STRING
+q = TarefaFactory.criar("quiz", titulo="Prova 1", nota=8, nota_max=10)
+print(isinstance(q, TarefaQuiz), q.exibir_dados(), sep="\n")
 
-def test_factory_cria_leitura():
-    obj = TarefaFactory.criar(TipoTarefa.LEITURA, paginas_lidas=5, total_paginas=20)
-    assert isinstance(obj, TarefaLeitura)
+l = TarefaFactory.criar("leitura", titulo="Capítulo 1", total_paginas=50, paginas_lidas=20)
+print(isinstance(l, TarefaLeitura), l.exibir_dados(), sep="\n")
 
-def test_factory_cria_pratica():
-    obj = TarefaFactory.criar(TipoTarefa.PRATICA, etapas_concluidas=2, total_etapas=5)
-    assert isinstance(obj, TarefaPratica)
+p = TarefaFactory.criar("pratica", titulo="Lab 1", total_etapas=6, etapas_concluidas=3)
+print(isinstance(p, TarefaPratica), p.exibir_dados(), sep="\n")
 
-def test_factory_cria_projeto():
-    obj = TarefaFactory.criar(TipoTarefa.PROJETO, entregas_aprovadas=1, total_entregas=3)
-    assert isinstance(obj, TarefaProjeto)
+pj = TarefaFactory.criar("projeto", titulo="Projeto Final", total_entregas=4, entregas_aprovadas=1)
+print(isinstance(pj, TarefaProjeto), pj.exibir_dados(), sep="\n")
+
+# 2) Criação por ENUM
+l2 = TarefaFactory.criar(TipoTarefaEstudo.LEITURA, titulo="Capítulo 2", total_paginas=30, paginas_lidas=15)
+print(isinstance(l2, TarefaLeitura), l2.exibir_dados(), sep="\n")
+
+# 3) Erros esperados (campos obrigatórios faltando)
+try:
+    TarefaFactory.criar("leitura", titulo="Capítulo sem total")
+except Exception as e:
+    print("Erro (ok - faltou total_paginas):", e)
+
+try:
+    TarefaFactory.criar("quiz", titulo="Prova sem nota")
+except Exception as e:
+    print("Erro (ok - faltou nota):", e)
