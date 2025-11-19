@@ -27,11 +27,13 @@ class TarefaQuiz(TarefaEstudo):
             v = 1.0
         self.__nota_max = v
         # revalida nota se já existir
-        if hasattr(self, "_TarefaQuiz__nota"):
-            if self.__nota < 0:
+        try:
+            if self.__nota < 0.0:
                 self.__nota = 0.0
             if self.__nota > self.__nota_max:
                 self.__nota = self.__nota_max
+        except AttributeError:
+            pass
 
     @property
     def nota(self):
@@ -45,8 +47,12 @@ class TarefaQuiz(TarefaEstudo):
             v = 0.0
         if v < 0.0:
             v = 0.0
-        if hasattr(self, "_TarefaQuiz__nota_max") and v > self.__nota_max:
-            v = self.__nota_max
+        # limita ao máximo se já definido
+        try:
+            if v > self.__nota_max:
+                v = self.__nota_max
+        except AttributeError:
+            pass
         self.__nota = v
 
     # --- métodos especiais/auxiliares ---
@@ -67,4 +73,3 @@ class TarefaQuiz(TarefaEstudo):
         """Conclui o quiz marcando data e status."""
         self.data_realizacao = datetime.now()
         self.status = StatusTarefa.CONCLUIDA
-
