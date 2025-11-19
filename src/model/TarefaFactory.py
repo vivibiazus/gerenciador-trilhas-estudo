@@ -89,5 +89,4 @@ class TarefaFactory:
         raise ValueError("Tipo de tarefa inválido. Use: leitura, quiz, pratica ou projeto.")
 
 
-        raise ValueError("Tipo de tarefa inválido. Use: leitura, quiz, pratica ou projeto.")
 
