@@ -8,5 +8,5 @@ class MediaSimplesEstrategia(EstrategiaProgresso):
         soma = 0.0
         for c in cursos:
             soma += c.progresso()
-        return soma / float(len(cursos))
+        return soma / len(cursos)
 
