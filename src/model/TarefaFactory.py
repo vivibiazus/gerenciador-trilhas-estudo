@@ -1,3 +1,5 @@
+# src/model/TarefaFactory.py
+from .TipoTarefaEstudo import TipoTarefaEstudo
 from .TarefaLeitura import TarefaLeitura
 from .TarefaQuiz import TarefaQuiz
 from .TarefaPratica import TarefaPratica
@@ -8,33 +10,85 @@ class TarefaFactory:
     @staticmethod
     def criar(tipo, **kwargs):
         """
-        Cria uma tarefa de estudo a partir de um 'tipo' textual.
-        Exemplos:
-          - criar("leitura", titulo="Capítulo 1", total_paginas=30, paginas_lidas=10)
-          - criar("quiz", titulo="Prova 1", nota=8, nota_max=10)
-          - criar("pratica", titulo="Lab 1", total_etapas=6, etapas_concluidas=2)
-          - criar("projeto", titulo="Projeto Final", total_entregas=4, entregas_aprovadas=1)
+        Cria uma tarefa de estudo de acordo com o 'tipo'.
+        Aceita:
+          - string: "leitura", "quiz", "pratica", "projeto"
+          - enum:   TipoTarefaEstudo.LEITURA, QUIZ, PRATICA, PROJETO
+
+        Parâmetros esperados por tipo:
+          leitura -> titulo, total_paginas, (paginas_lidas=0), descricao, data_realizacao
+          quiz    -> titulo, nota, (nota_max=10), descricao, data_realizacao
+          pratica -> titulo, total_etapas, (etapas_concluidas=0), descricao, data_realizacao
+          projeto -> titulo, total_entregas, (entregas_aprovadas=0), descricao, data_realizacao
         """
         if not tipo:
-            raise ValueError("Tipo de tarefa não informado")
+            raise ValueError("Tipo de tarefa não informado.")
 
-        t = str(tipo).strip().lower()
+        # normaliza o tipo (enum ou string) para minúsculas
+        if isinstance(tipo, TipoTarefaEstudo):
+            chave = tipo.name.lower()  # "LEITURA" -> "leitura"
+        else:
+            chave = str(tipo).strip().lower()
 
-        if t == "leitura":
+        # ---- LEITURA --------------------------------------------------------
+        if chave == "leitura":
+            if kwargs.get("total_paginas") is None:
+                raise ValueError("Para 'leitura', informe 'total_paginas'.")
             kwargs.setdefault("titulo", "Leitura")
-            return TarefaLeitura(**kwargs)
+            kwargs.setdefault("paginas_lidas", 0)
+            return TarefaLeitura(
+                titulo=kwargs.get("titulo"),
+                total_paginas=kwargs.get("total_paginas"),
+                paginas_lidas=kwargs.get("paginas_lidas"),
+                descricao=kwargs.get("descricao"),
+                data_realizacao=kwargs.get("data_realizacao"),
+            )
 
-        if t == "quiz":
+        # ---- QUIZ -----------------------------------------------------------
+        if chave == "quiz":
+            if kwargs.get("nota") is None:
+                raise ValueError("Para 'quiz', informe 'nota'.")
             kwargs.setdefault("titulo", "Quiz")
-            return TarefaQuiz(**kwargs)
+            kwargs.setdefault("nota_max", 10)
+            return TarefaQuiz(
+                titulo=kwargs.get("titulo"),
+                nota=kwargs.get("nota"),
+                nota_max=kwargs.get("nota_max"),
+                descricao=kwargs.get("descricao"),
+                data_realizacao=kwargs.get("data_realizacao"),
+            )
 
-        if t == "pratica":
+        # ---- PRÁTICA --------------------------------------------------------
+        if chave == "pratica":
+            if kwargs.get("total_etapas") is None:
+                raise ValueError("Para 'pratica', informe 'total_etapas'.")
             kwargs.setdefault("titulo", "Prática")
-            return TarefaPratica(**kwargs)
+            kwargs.setdefault("etapas_concluidas", 0)
+            return TarefaPratica(
+                titulo=kwargs.get("titulo"),
+                total_etapas=kwargs.get("total_etapas"),
+                etapas_concluidas=kwargs.get("etapas_concluidas"),
+                descricao=kwargs.get("descricao"),
+                data_realizacao=kwargs.get("data_realizacao"),
+            )
 
-        if t == "projeto":
+        # ---- PROJETO --------------------------------------------------------
+        if chave == "projeto":
+            if kwargs.get("total_entregas") is None:
+                raise ValueError("Para 'projeto', informe 'total_entregas'.")
             kwargs.setdefault("titulo", "Projeto")
-            return TarefaProjeto(**kwargs)
+            kwargs.setdefault("entregas_aprovadas", 0)
+            return TarefaProjeto(
+                titulo=kwargs.get("titulo"),
+                total_entregas=kwargs.get("total_entregas"),
+                entregas_aprovadas=kwargs.get("entregas_aprovadas"),
+                descricao=kwargs.get("descricao"),
+                data_realizacao=kwargs.get("data_realizacao"),
+            )
+
+        # ---- tipo inválido --------------------------------------------------
+        raise ValueError("Tipo de tarefa inválido. Use: leitura, quiz, pratica ou projeto.")
+
 
         raise ValueError("Tipo de tarefa inválido. Use: leitura, quiz, pratica ou projeto.")
 
