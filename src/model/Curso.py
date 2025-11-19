@@ -32,7 +32,7 @@ class Curso:
     @property
     def aulas(self):
         # devolve CÓPIA para manter encapsulamento
-        return list(self.__aulas)
+        return self.__aulas
 
     # --- composição ---
 
@@ -49,7 +49,7 @@ class Curso:
         soma = 0.0
         for a in self.__aulas:
             soma += a.progresso()
-        return soma / float(len(self.__aulas))
+        return soma / len(self.__aulas)
 
     # --- apresentação ---
 
